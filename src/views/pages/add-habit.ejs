@@ -1,0 +1,246 @@
+<%- include('../partials/header') %>
+
+<div class="row justify-content-center animation-fadeInUp">
+    <div class="col-lg-8 col-xl-6">
+        <div class="card glass-effect">
+            <div class="card-body p-5">
+                <div class="text-center mb-5">
+                
+                    <h1 class="display-6 fw-bold mb-2">
+                        <%= habit ? 'Edit Your Habit' : 'Create a New Habit' %>
+                    </h1>
+                    <p class="text-secondary">
+                        <% if (habit) { %>
+                            Update your habit details to keep improving
+                        <% } else { %>
+                            Small consistent actions lead to big transformations
+                        <% } %>
+                    </p>
+                </div>
+
+                <form action="<%= habit ? '/habits/edit/' + habit.id : '/habits/add' %>" method="POST" class="needs-validation" novalidate>
+                    <div class="mb-4">
+                        <label for="name" class="form-label">
+                            <span class="fw-semibold">Habit Name</span>
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" 
+                               class="form-control form-control-lg" 
+                               id="name" 
+                               name="name" 
+                               value="<%= habit ? habit.name : '' %>" 
+                               required 
+                               placeholder="e.g., Drink 8 glasses of water"
+                               maxlength="100">
+                        <div class="form-text">Give your habit a clear, specific name</div>
+                        <div class="invalid-feedback">
+                            Please provide a habit name.
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="category" class="form-label">
+                            <span class="fw-semibold">Category</span>
+                            <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select form-select-lg" id="category" name="category" required>
+                            <option value="" disabled <%= !habit ? 'selected' : '' %>>Choose a category...</option>
+                            <% const categories = [
+                                { value: 'Health', icon: '🏥', description: 'Physical and mental wellness' },
+                                { value: 'Fitness', icon: '💪', description: 'Exercise and physical activity' },
+                                { value: 'Study', icon: '📚', description: 'Learning and education' },
+                                { value: 'Productivity', icon: '⚡', description: 'Work and efficiency' },
+                                { value: 'Mindfulness', icon: '🧘', description: 'Mental clarity and peace' }
+                            ]; %>
+                            <% categories.forEach(cat => { %>
+                                <option value="<%= cat.value %>" 
+                                        <%= (habit && habit.category === cat.value) ? 'selected' : '' %>>
+                                    <%= cat.icon %> <%= cat.value %> - <%= cat.description %>
+                                </option>
+                            <% }); %>
+                        </select>
+                        <div class="form-text">Categories help organize and track different types of habits</div>
+                        <div class="invalid-feedback">
+                            Please select a category.
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <label for="duration_days" class="form-label">
+                            <span class="fw-semibold">Number of Days</span>
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input type="number" 
+                               class="form-control form-control-lg" 
+                               id="duration_days" 
+                               name="duration_days" 
+                               value="<%= habit ? habit.duration_days : '' %>" 
+                               required
+                               placeholder="e.g., 30"
+                               min="1"
+                               max="365">
+                        <div class="form-text">How many days do you want to track this habit?</div>
+                        <div class="invalid-feedback">
+                            Please enter the number of days (1-365).
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column flex-sm-row gap-3">
+                        <button type="submit" class="btn btn-primary btn-lg interactive flex-fill">
+                            <% if (habit) { %>
+                                <span class="me-2">💾</span>Update Habit
+                            <% } else { %>
+                                <span class="me-2">🚀</span>Create Habit
+                            <% } %>
+                        </button>
+                        <a href="/dashboard" class="btn btn-outline-secondary btn-lg hover-lift flex-fill" role="button">
+                            <span class="me-2">←</span>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <% if (!habit) { %>
+        <div class="card glass-effect mt-4 animation-slideUp">
+            <div class="card-body p-4">
+                <h5 class="fw-semibold mb-3">💡 Tips for Success</h5>
+                <ul class="list-unstyled mb-0">
+                    <li class="d-flex align-items-start mb-2">
+                        <span class="badge bg-primary rounded-pill me-3 mt-1">1</span>
+                        <span>Start small - it's easier to be consistent with simple habits</span>
+                    </li>
+                    <li class="d-flex align-items-start mb-2">
+                        <span class="badge bg-primary rounded-pill me-3 mt-1">2</span>
+                        <span>Be specific - "Exercise for 30 minutes" is better than "Exercise"</span>
+                    </li>
+                    <li class="d-flex align-items-start">
+                        <span class="badge bg-primary rounded-pill me-3 mt-1">3</span>
+                        <span>Stack habits - attach new habits to existing routines</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <% } %>
+    </div>
+</div>
+
+<script>
+// Form validation
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+
+<!-- AUTO-SAVE FORM DRAFT (sessionStorage - clears on tab close) -->
+<% if (!habit) { %>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Checking for storage utilities...');
+    
+    // Check if storage utilities are loaded
+    if (typeof UIState === 'undefined') {
+        console.error('Storage utilities not loaded! Make sure storage-utils.js is included.');
+        return;
+    }
+    
+    const form = document.querySelector('form');
+    const nameInput = document.getElementById('name');
+    const categoryInput = document.getElementById('category');
+    const durationInput = document.getElementById('duration_days');
+    
+    if (!nameInput || !categoryInput || !durationInput) {
+        console.error('Form inputs not found');
+        return;
+    }
+    
+    console.log('Storage utilities loaded, setting up auto-save...');
+    
+    // Try to load draft from sessionStorage (clears when tab closes)
+    const savedDraft = UIState.formDraft.get('habitForm');
+    
+    console.log('Checking for saved draft...', savedDraft ? 'FOUND' : 'NOT FOUND');
+    
+    if (savedDraft) {
+        try {
+            console.log('Draft data:', savedDraft);
+            
+            if (savedDraft.name) {
+                nameInput.value = savedDraft.name;
+                console.log('Restored name:', savedDraft.name);
+            }
+            if (savedDraft.category) {
+                categoryInput.value = savedDraft.category;
+                console.log('Restored category:', savedDraft.category);
+            }
+            if (savedDraft.duration_days) {
+                durationInput.value = savedDraft.duration_days;
+                console.log('Restored duration:', savedDraft.duration_days);
+            }
+            
+            // Show notification that draft was restored
+            console.log('Draft restored from current session');
+            
+            // Visual feedback
+            const notification = document.createElement('div');
+            notification.style.cssText = 'position:fixed;top:20px;right:20px;background:#10b981;color:white;padding:15px 20px;border-radius:8px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.15);animation:slideIn 0.3s ease;';
+            notification.innerHTML = 'Draft restored from current session<br><small>' + savedDraft.name + '</small>';
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        } catch (e) {
+            console.error('Error parsing draft:', e);
+        }
+    } else {
+        console.log('No saved draft found');
+    }
+    
+    // Auto-save on input (with debounce) - saves to sessionStorage
+    let saveTimeout;
+    function autoSaveDraft() {
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(() => {
+            const draft = {
+                name: nameInput.value,
+                category: categoryInput.value,
+                duration_days: durationInput.value,
+                savedAt: new Date().toISOString()
+            };
+            
+            // Only save if there's actual content
+            if (draft.name || draft.category || draft.duration_days) {
+                UIState.formDraft.set('habitForm', draft);
+                console.log('Draft auto-saved to sessionStorage');
+            }
+        }, 1000); // Save 1 second after user stops typing
+    }
+    
+    // Attach auto-save to all inputs
+    nameInput.addEventListener('input', autoSaveDraft);
+    categoryInput.addEventListener('change', autoSaveDraft);
+    durationInput.addEventListener('input', autoSaveDraft);
+    
+    // Clear draft on successful submit
+    form.addEventListener('submit', function() {
+        UIState.formDraft.clear('habitForm');
+        console.log('Draft cleared after submit');
+    });
+});
+</script>
+<% } %>
+
+<%- include('../partials/footer') %>

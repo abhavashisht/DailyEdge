@@ -1,0 +1,43 @@
+{
+  "name": "dailyedge",
+  "version": "1.0.0",
+  "description": "A habit tracking app to build habits, stay consistent, and achieve your goals.",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:browser": "node tests/integration/login.test.js"
+  },
+  "keywords": [
+    "habit",
+    "tracker",
+    "nodejs",
+    "express",
+    "postgresql"
+  ],
+  "author": "Your Name",
+  "license": "ISC",
+  "dependencies": {
+    "aws": "^0.0.3-2",
+    "axios": "^1.12.2",
+    "bcrypt": "^6.0.0",
+    "chart.js": "^4.5.0",
+    "connect-redis": "^9.0.0",
+    "dotenv": "^16.6.1",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-session": "^1.18.2",
+    "node-cron": "^3.0.3",
+    "pg": "^8.16.3",
+    "redis": "^5.9.0",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.10",
+    "puppeteer": "^22.15.0"
+  },
+  "type": "commonjs"
+}
