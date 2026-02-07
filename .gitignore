@@ -1,0 +1,21 @@
+# Node
+node_modules/
+
+# Env files
+.env
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+
+# Coverage
+coverage/
+
+# Redis dump
+dump.rdb
+
+# VS Code
+.vscode/
